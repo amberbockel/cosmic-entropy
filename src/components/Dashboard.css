@@ -1,0 +1,127 @@
+.sandbox-dashboard {
+  position: absolute;
+  top: clamp(2rem, 5vw, 6rem);
+  right: clamp(2rem, 5vw, 4rem);
+  width: 320px;
+  background: rgba(15, 15, 20, 0.25);
+  backdrop-filter: blur(48px) saturate(180%);
+  -webkit-backdrop-filter: blur(48px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  pointer-events: auto;
+  z-index: 50;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sandbox-dashboard.hidden {
+  opacity: 0;
+  transform: translateX(20px);
+  pointer-events: none;
+}
+
+.dashboard-header h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-header p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0 0;
+  color: #a5f3fc;
+  opacity: 0.8;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-header label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.control-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Glassmorphic Range Slider */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  margin: 0.5rem 0;
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+input[type=range]::-webkit-slider-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -7px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(0,0,0,0.1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(0,0,0,0.1);
+}
+
+.control-tooltip {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .sandbox-dashboard {
+    bottom: 2rem;
+    top: auto;
+    right: 2rem;
+    left: 2rem;
+    width: auto;
+    padding: 1.5rem;
+  }
+}
+

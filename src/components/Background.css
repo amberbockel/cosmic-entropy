@@ -1,0 +1,18 @@
+.particle-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1; /* Keep it behind text, but over background */
+  pointer-events: none; /* Let any UI text be clickable through it */
+  background: #020205; /* Fallback obsidian black */
+}
+
+/* Ensure the canvas fills the container */
+.particle-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
