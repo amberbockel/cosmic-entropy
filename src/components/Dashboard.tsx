@@ -70,8 +70,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, obs
       </div>
 
       <div className="mechanic-hint">
+        <strong>🕸️ The Cosmic Spider-Web:</strong>
+        The glowing lines represent dark matter. In space, gravity weaves matter into massive, interconnected strings!
+        <br/><br/>
         <strong>🎮 Interactive Physics Tool:</strong> 
-        Your mouse represents a <em>Supermassive Black Hole</em>. Move it around the canvas to bend gravity and twist dark matter into glowing galaxies!
+        Your mouse represents a <em>Supermassive Black Hole</em>. Move it around the canvas to bend gravity and twist the web into glowing galaxies!
       </div>
 
       {observation && (
