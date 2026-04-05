@@ -129,7 +129,7 @@ export const vertexShader = `
         vec2 aspectMouse = vec2(uMouse.x * uAspect, uMouse.y);
         
         float distNdc = length(aspectNdcPos - aspectMouse);
-        float repelScale = 1.0 - smoothstep(0.0, 1.2, distNdc); // Massively expanded influence radius so the vortex easily touches particles across the void
+        float repelScale = 1.0 - smoothstep(0.0, 0.35, distNdc); // Tighter, localized influence radius to form a beautiful local vortex
         
         vVelocity += repelScale * 15.0; // Violent color shift when interacting
         
@@ -142,9 +142,9 @@ export const vertexShader = `
             // 70% Swirl, 30% Pull (creates a spiraling vortex of ordered information)
             vec2 vortexDir = normalize(swirlDir * 0.7 - radialDir * 0.3);
             
-            // Apply dramatic fluid offset based on depth (w)
-            gl_Position.x += (vortexDir.x / uAspect) * repelScale * gl_Position.w * 3.5;
-            gl_Position.y += vortexDir.y * repelScale * gl_Position.w * 3.5;
+            // Apply controlled fluid offset based on depth (w)
+            gl_Position.x += (vortexDir.x / uAspect) * repelScale * gl_Position.w * 0.4;
+            gl_Position.y += vortexDir.y * repelScale * gl_Position.w * 0.4;
         } else {
             // GLOBAL ENTROPY RADIATION
             // The further away from the local order vortex you are, the more chaotic the noise becomes.
