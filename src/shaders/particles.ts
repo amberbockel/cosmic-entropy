@@ -87,7 +87,9 @@ export const vertexShader = `
     float t = rawT - (aLineIndex * trailLength);
     
     // Map instance seed to a wide initial position space to heavily de-blob the visual center
-    float radius = 55.0;
+    // We intentionally keep this mathematically larger than the maximum noise displacement (10 units logic) 
+    // to preserve the empty Black Hole, but small enough to fit natively in the screen.
+    float radius = 24.0;
     
     // 1. Parametric Orbit (Continuous over time)
     float angle = t * (aRandom.x * 0.5 + 0.1) + (aRandom.z * 10.0);
@@ -112,8 +114,8 @@ export const vertexShader = `
     
     vec3 finalPos = orbitPos + noiseOffset;
     
-    // Gravity influence collapses the orbit to 0,0,0
-    finalPos = mix(finalPos, vec3(0.0), clamp(uGravityScale * 0.5, 0.0, 1.0));
+    // Gravity influence pulls the orbit inward (creates topological density)
+    finalPos = mix(finalPos, vec3(0.0), clamp(uGravityScale * 0.25, 0.0, 0.8));
 
     vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
     gl_Position = projectionMatrix * mvPosition;
@@ -127,22 +129,36 @@ export const vertexShader = `
         vec2 aspectMouse = vec2(uMouse.x * uAspect, uMouse.y);
         
         float distNdc = length(aspectNdcPos - aspectMouse);
-        float repelScale = 1.0 - smoothstep(0.0, 0.70, distNdc); // Massively expanded 70% influence radius
+        float repelScale = 1.0 - smoothstep(0.0, 1.2, distNdc); // Massively expanded influence radius so the vortex easily touches particles across the void
         
-        vVelocity += repelScale * 5.0;
+        vVelocity += repelScale * 15.0; // Violent color shift when interacting
         
         if (repelScale > 0.0) {
-            // Fluid Dynamics: Curl Vortex and Slight Attraction
+            // Fluid Dynamics: Curl Vortex and Slight Attraction (Local Order)
             vec2 toParticle = aspectNdcPos - aspectMouse;
             vec2 radialDir = normalize(toParticle);
             vec2 swirlDir = vec2(-radialDir.y, radialDir.x); // Perpendicular tangent
             
-            // 70% Swirl, 30% Pull (creates a spiraling vortex)
+            // 70% Swirl, 30% Pull (creates a spiraling vortex of ordered information)
             vec2 vortexDir = normalize(swirlDir * 0.7 - radialDir * 0.3);
             
-            // Apply fluid offset based on depth (w)
-            gl_Position.x += (vortexDir.x / uAspect) * repelScale * gl_Position.w * 0.7;
-            gl_Position.y += vortexDir.y * repelScale * gl_Position.w * 0.7;
+            // Apply dramatic fluid offset based on depth (w)
+            gl_Position.x += (vortexDir.x / uAspect) * repelScale * gl_Position.w * 3.5;
+            gl_Position.y += vortexDir.y * repelScale * gl_Position.w * 3.5;
+        } else {
+            // GLOBAL ENTROPY RADIATION
+            // The further away from the local order vortex you are, the more chaotic the noise becomes.
+            // This visually proves the 2nd Law of Thermodynamics: creating local order radiates heat!
+            float environmentalChaos = smoothstep(0.70, 1.5, distNdc);
+            
+            // Generate smooth environmental warping driven by the Dark Energy scale
+            float warpX = sin(ndcPos.y * 15.0 + uTime * 3.0) * cos(ndcPos.x * 10.0 - uTime * 2.0);
+            float warpY = cos(ndcPos.x * 15.0 - uTime * 3.0) * sin(ndcPos.y * 10.0 + uTime * 2.0);
+            
+            gl_Position.x += warpX * environmentalChaos * uBloomOverride * 0.15 * gl_Position.w;
+            gl_Position.y += warpY * environmentalChaos * uBloomOverride * 0.15 * gl_Position.w;
+            
+            vVelocity += environmentalChaos * uBloomOverride * 3.0; // Boosts color to represent radiated heat
         }
     }
   }

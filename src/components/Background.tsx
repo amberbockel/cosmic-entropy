@@ -1,10 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { vertexShader, fragmentShader } from '../shaders/particles';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { SimulationSettings } from '../components/Dashboard';
 import './Background.css';
 
-export const Background: React.FC<{ settings: SimulationSettings, onReady?: () => void }> = ({ settings, onReady }) => {
+export const Background: React.FC<{ settings: SimulationSettings, onReady?: () => void, onInteract?: () => void }> = ({ settings, onReady, onInteract }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   
   // Self-contained camera zoom target
@@ -26,8 +29,14 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020205, 0.015);
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 40;
+    const aspect = window.innerWidth / window.innerHeight;
+    const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+    
+    // Automatically push camera back on narrow mobile screens so the torus radius fits horizontally
+    const getResponsiveZ = (ratio: number) => ratio < 1.0 ? 40 / ratio : 40;
+    
+    camera.position.z = getResponsiveZ(aspect);
+    targetZRef.current = camera.position.z;
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -35,11 +44,19 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     renderer.setClearColor(0x020205); // Obsidian background
     mountRef.current.appendChild(renderer.domElement);
 
-    // NATIVE PERFORMANCE RENDERER (Removed expensive Post-Processing Composer!)
-    // We will fake the bloom with additive blending opacity directly in the fragment shader.
+    // POST-PROCESSING PIPELINE
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    bloomPass.strength = 1.5; 
+    bloomPass.radius = 1.0;
+    bloomPass.threshold = 0.1;
+    
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
 
     // GEOMETRY GENERATION
-    const tendrilCount = 800; // Drastically reduced to prevent GPU Timeout on heavy Mac hardware
+    const tendrilCount = 3000; // Restored high-density particle web!
     const segmentsPerTendril = 15;
     const totalVertices = tendrilCount * segmentsPerTendril;
 
@@ -105,9 +122,23 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     const targetMouse = new THREE.Vector2(-9999.0, -9999.0);
     const currentMouse = new THREE.Vector2(-9999.0, -9999.0);
     
+    let lastInteractTime = 0;
     const handleMouseMove = (e: MouseEvent) => {
+      // Isolate interaction: Ignore dashboard hovers to prevent UI interference
+      if (e.target && (e.target as Element).closest && (e.target as Element).closest('.dashboard-wrapper')) {
+        targetMouse.x = -9999.0;
+        targetMouse.y = -9999.0;
+        return;
+      }
+
       targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      
+      const now = Date.now();
+      if (now - lastInteractTime > 500) { // Throttle interaction logs
+        if (onInteract) onInteract();
+        lastInteractTime = now;
+      }
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -129,21 +160,26 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
       
       // Map interactive sandbox settings dynamically into the WebGL Engine each frame
       material.uniforms.uTime.value = elapsedTime;
-      material.uniforms.uGravityScale.value = settingsRef.current.gravity;
-      material.uniforms.uSpeed.value = settingsRef.current.timeSpeed;
+      material.uniforms.uGravityScale.value = settingsRef.current.density;
+      // Thermodynamic Velocity Engine: Kinetic energy maps to Temperature (Epoch)
+      let targetSpeed = 1.0;
+      if (settingsRef.current.epoch < 0.5) targetSpeed = 4.0; // Extreme Heat
+      else if (settingsRef.current.epoch > 1.5) targetSpeed = 0.15; // Absolute Zero (Heat Death)
+
+      // Lerp speed for smooth thermodynamic transitions
+      material.uniforms.uSpeed.value += (targetSpeed - material.uniforms.uSpeed.value) * 0.05;
       // Pass the Dashboard 'bloom' slider purely as an alpha/brightness multiplier!
-      material.uniforms.uBloomOverride.value = settingsRef.current.bloomStrength;
+      material.uniforms.uBloomOverride.value = settingsRef.current.darkEnergy;
+      bloomPass.strength = 0.05 + (settingsRef.current.darkEnergy * 0.15); // Heavily constrained glow injection
 
       // Smoothly interpolate mouse position for elegant interaction
       if (targetMouse.x === -9999.0) {
-        // IDLE STATE: Automated wandering mouse to prove repulsion logic visually
-        currentMouse.x = Math.sin(elapsedTime * 1.5) * 0.4;
-        currentMouse.y = Math.cos(elapsedTime * 2.0) * 0.3;
-        material.uniforms.uMouse.value.set(currentMouse.x, currentMouse.y);
+        // IDLE STATE: Keep mouse perfectly off-screen until user interacts
+        material.uniforms.uMouse.value.set(-9999.0, -9999.0);
       } else {
         // ACTIVE STATE: Lerp towards real mouse
         if (currentMouse.x === -9999.0) currentMouse.copy(targetMouse);
-        currentMouse.lerp(targetMouse, 0.1);
+        currentMouse.lerp(targetMouse, 0.3); // Increased tracking snappiness!
         material.uniforms.uMouse.value.set(currentMouse.x, currentMouse.y);
       }
 
@@ -164,8 +200,26 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
         camera.lookAt(0, 0, 0);
       }
 
-      // RAW PERFORMANCE RENDER
-      renderer.render(scene, camera);
+      const now = Date.now();
+      frameCount++;
+      
+      // Auto-downgrade performance check every 1 second
+      if (now - lastFPSCheck >= 1000) {
+        if (!isDowngraded && elapsedTime > 3.0) { // Wait for shader compilation freeze to unblock
+          if (frameCount < 45) { // If dipping below comfortable fluid framerate
+            console.warn("Transcendental Engine: Hardware limit detected! Auto-downgrading from Cinematic Bloom to Native Render to preserve interactivity...");
+            isDowngraded = true;
+          }
+        }
+        frameCount = 0;
+        lastFPSCheck = now;
+      }
+
+      if (isDowngraded) {
+        renderer.render(scene, camera); // Lightweight fallback
+      } else {
+        composer.render(); // Heavy cinematic bloom
+      }
       
       // Fire ready callback on EXACTLY the first successfully drawn frame
       if (!isReadyFired) {
@@ -181,13 +235,28 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     };
 
     let isReadyFired = false;
-    animate();
+    let frameCount = 0;
+    let lastFPSCheck = Date.now();
+    let isDowngraded = false;
+    
+    // Defer the synchronous WebGL compile by two frames to guarantee 
+    // the browser paints the CSS loader ring before locking the main thread!
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        animate();
+      });
+    });
 
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = aspect;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      material.uniforms.uAspect.value = window.innerWidth / window.innerHeight;
+      composer.setSize(window.innerWidth, window.innerHeight);
+      material.uniforms.uAspect.value = aspect;
+      
+      // Auto-adjust base zoom so mobile doesn't clip the outer bounds of the particles
+      targetZRef.current = aspect < 1.0 ? 40 / aspect : 40;
     };
     window.addEventListener('resize', handleResize);
 

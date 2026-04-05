@@ -1,20 +1,41 @@
 import { useState } from 'react'
 import { Background } from './components/Background'
 import { Dashboard, type SimulationSettings } from './components/Dashboard'
+import { useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [isSandboxVisible, setIsSandboxVisible] = useState(false);
+  const [isSandboxVisible, setIsSandboxVisible] = useState(true);
   const [isScienceVisible, setIsScienceVisible] = useState(false);
   const [isEngineReady, setIsEngineReady] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
   
-  // Interactive Sandbox state
+  // Cosmological Physics state
   const [settings, setSettings] = useState<SimulationSettings>({
-    gravity: 0.8,
-    timeSpeed: 1.5,
-    vortexScale: 1.0,
-    bloomStrength: 0.6 // Softened bloom to un-blob the stars
+    epoch: 0, // 0 = Plasma Era (Maximum Interactivity)
+    density: 2.0,
+    expansion: 2.5,
+    darkEnergy: 2.0
   });
+
+  const [currentObservation, setCurrentObservation] = useState("We are at the beginning of Time. Try moving the sliders or your mouse!");
+
+  useEffect(() => {
+    if (settings.epoch === 0) setCurrentObservation("🪐 TIME TRAVEL: The very beginning! It's so hot and crowded that atoms can't even form yet!");
+    else if (settings.epoch === 1) setCurrentObservation("🪐 TIME TRAVEL: The Cosmic Web! Gravity is pulling matter together like a giant spider web in space.");
+    else if (settings.epoch === 2) setCurrentObservation("❄️ TIME TRAVEL: The End of Everything. The universe stretched so far that everything froze and drifted apart.");
+  }, [settings.epoch]);
+
+  useEffect(() => {
+    if (settings.expansion > 2.0) setCurrentObservation("🚨 WARNING: The universe is stretching way too fast! The space web is ripping apart!");
+    if (settings.density < 0.2) setCurrentObservation("🚨 WARNING: There isn't enough gravity left! Galaxies are floating away from each other.");
+  }, [settings.expansion, settings.density]);
+
+  useEffect(() => {
+    if (isInteracting) {
+      setCurrentObservation("✨ WOW: You made a galaxy! But remember: creating order here makes the rest of space more chaotic!");
+    }
+  }, [isInteracting]);
 
   return (
     <>
@@ -23,7 +44,11 @@ function App() {
         <p>INITIALIZING MACRO-PHYSICS...</p>
       </div>
       
-      <Background settings={settings} onReady={() => setIsEngineReady(true)} />
+      <Background 
+        settings={settings} 
+        onReady={() => setIsEngineReady(true)} 
+        onInteract={() => setIsInteracting(prev => !prev)} 
+      />
       
       <main className="hero-overlay">
         <div className="title-container">
@@ -41,16 +66,13 @@ function App() {
           {isScienceVisible && (
             <div className="science-summary">
               <p>
-                This sandbox is an interactive WebGL simulation modeling the fundamental struggle that shapes our universe: the battle between <strong>Gravity</strong> and <strong>Thermodynamic Entropy</strong>.
+                This sandbox is an interactive WebGL simulation mapping the fundamental struggle that dictates the fate of our universe: the battle between <strong>Matter Density (Ωm)</strong> and <strong>Dark Energy (ΩΛ)</strong>.
               </p>
               <p>
-                In astrophysics, the universe is organized into a massive, interconnected lattice called the <strong>Cosmic Web</strong>. This web exists purely because of Gravity pulling particles into dense nodes and trailing filaments.
+                As governed by Information Theory and the Second Law of Thermodynamics, entropy represents the "hidden information" of a system. To visually demonstrate this, drag your mouse across the canvas. You will create a vortex of <strong>Local Order</strong> (a planetary orbit or star system). However, watch closely: generating this localized structure vigorously agitates the underlying quantum noise field around it, visually demonstrating that creating pockets of order necessitates a massive increase in <strong>Global Entropy</strong>!
               </p>
               <p>
-                However, gravity is constantly fighting a losing battle against <strong>Entropy</strong> and <strong>Dark Energy</strong>—the forces pushing space apart. The twisting, chaotic "fluids" you see here are generated using 4D Perlin Noise to represent this entropic counter-force.
-              </p>
-              <p>
-                When you scale down the Gravity slider, you are effectively watching Cosmic Heat Death in real time: the entropic noise overpowers the gravitational bonds, and the fluid dynamics scatter the organized starlight back into the infinite, unstructured void.
+                In the Laboratory, you can travel entirely outside the human timeline. Use the Epoch slider to reverse time to the ultra-dense Planck Epoch ($10^&#123;-43&#125;$ seconds), or slide it forward to witness Heat Death in the Black Hole Era—where matter density reaches zero, and the universe disperses entirely back into the void.
               </p>
             </div>
           )}
@@ -58,7 +80,7 @@ function App() {
       </main>
 
       <div className={`dashboard-wrapper ${isSandboxVisible ? 'visible' : 'hidden'}`}>
-        <Dashboard settings={settings} setSettings={setSettings} />
+        <Dashboard settings={settings} setSettings={setSettings} observation={currentObservation} />
       </div>
 
       <button 
