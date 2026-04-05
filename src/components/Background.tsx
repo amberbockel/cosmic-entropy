@@ -162,9 +162,9 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
       material.uniforms.uTime.value = elapsedTime;
       material.uniforms.uGravityScale.value = settingsRef.current.density;
       // Thermodynamic Velocity Engine: Kinetic energy maps to Temperature (Epoch)
-      let targetSpeed = 1.0;
-      if (settingsRef.current.epoch < 0.5) targetSpeed = 4.0; // Extreme Heat
-      else if (settingsRef.current.epoch > 1.5) targetSpeed = 0.15; // Absolute Zero (Heat Death)
+      let targetSpeed = 0.35; // Default (Our Galaxy) is a nice, slow graceful speed
+      if (settingsRef.current.epoch < 0.5) targetSpeed = 1.0; // Extreme Heat (Faster, but readable)
+      else if (settingsRef.current.epoch > 1.5) targetSpeed = 0.05; // Absolute Zero (Heat Death)
 
       // Lerp speed for smooth thermodynamic transitions
       material.uniforms.uSpeed.value += (targetSpeed - material.uniforms.uSpeed.value) * 0.05;
