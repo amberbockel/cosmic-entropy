@@ -177,9 +177,9 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
         // IDLE STATE: Keep mouse perfectly off-screen until user interacts
         material.uniforms.uMouse.value.set(-9999.0, -9999.0);
       } else {
-        // ACTIVE STATE: Lerp towards real mouse
+        // ACTIVE STATE: Lerp towards real mouse extremely slowly for a heavy, massive gravity feel
         if (currentMouse.x === -9999.0) currentMouse.copy(targetMouse);
-        currentMouse.lerp(targetMouse, 0.3); // Increased tracking snappiness!
+        currentMouse.lerp(targetMouse, 0.04); // Dropped snappiness to make the mouse feel "heavy"
         material.uniforms.uMouse.value.set(currentMouse.x, currentMouse.y);
       }
 

@@ -131,7 +131,7 @@ export const vertexShader = `
         float distNdc = length(aspectNdcPos - aspectMouse);
         float repelScale = 1.0 - smoothstep(0.0, 0.35, distNdc); // Tighter, localized influence radius to form a beautiful local vortex
         
-        vVelocity += repelScale * 15.0; // Violent color shift when interacting
+        vVelocity += repelScale * 4.0; // Gentle, slower color shift when interacting
         
         if (repelScale > 0.0) {
             // Fluid Dynamics: Curl Vortex and Slight Attraction (Local Order)
