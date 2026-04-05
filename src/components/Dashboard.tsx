@@ -69,6 +69,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, obs
         <p>Mathematical Constraints of the Universe</p>
       </div>
 
+      <div className="mechanic-hint">
+        <strong>🎮 Interactive Physics Tool:</strong> 
+        Your mouse represents a <em>Supermassive Black Hole</em>. Move it around the canvas to bend gravity and twist dark matter into glowing galaxies!
+      </div>
+
       {observation && (
         <div className="observation-card">
           <span className="observation-badge">LIVE OBSERVATION</span>

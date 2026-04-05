@@ -60,6 +60,25 @@
   opacity: 0.8;
 }
 
+.mechanic-hint {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+  margin-top: -0.5rem;
+}
+
+.mechanic-hint strong {
+  color: #fff;
+  display: block;
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
 .observation-card {
   background: rgba(0, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.2);
