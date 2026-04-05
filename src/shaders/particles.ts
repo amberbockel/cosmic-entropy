@@ -155,7 +155,7 @@ export const vertexShader = `
     }
     
     // Size the particles dynamically based on depth
-    gl_PointSize = clamp(30.0 / gl_Position.w, 1.0, 15.0);
+    gl_PointSize = clamp(45.0 / gl_Position.w, 4.0, 22.0);
     // Expand sizes slightly based on dark energy bloom and random seed
     gl_PointSize *= (1.0 + uBloomOverride * 0.5) * (0.5 + aRandom.z);
   }

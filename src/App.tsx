@@ -21,21 +21,42 @@ function App() {
   const [currentObservation, setCurrentObservation] = useState("We are at the beginning of Time. Try moving the sliders or your mouse!");
 
   useEffect(() => {
-    if (settings.epoch === 0) setCurrentObservation("🪐 The Cosmic Soup: Everything is super hot! The particles bounce around like crazy!");
-    else if (settings.epoch === 1) setCurrentObservation("🪐 The Cosmic Soup: Cooling down! Gravity is clumping the bouncing dots together into galaxies.");
-    else if (settings.epoch === 2) setCurrentObservation("❄️ TIME TRAVEL: The End of Everything. The universe stretched so far that everything froze and drifted apart.");
-  }, [settings.epoch]);
+    // 1. Hard-coded Presets and Epochs (Highest Priority for the preset buttons)
+    if (settings.epoch === 0 && settings.density === 2.0 && settings.expansion === 2.5) {
+        setCurrentObservation("🔥 THE BIG BANG: It's so hot and crowded that atoms can't even form! The soup is boiling!");
+        return;
+    }
+    if (settings.epoch === 2 && settings.density === 0.0 && settings.expansion === 3.0) {
+        setCurrentObservation("❄️ HEAT DEATH: The universe stretched so far that everything froze and drifted apart into the dark abyss.");
+        return;
+    }
+    if (settings.epoch === 1 && settings.density === 0.8 && settings.expansion === 1.0) {
+        setCurrentObservation("🌎 OUR GALAXY: Perfect balance! Gravity is gently clumping the soup together into stars.");
+        return;
+    }
 
-  useEffect(() => {
-    if (settings.expansion > 2.0) setCurrentObservation("🚨 WARNING: The universe is stretching way too fast! The soup is flying apart!");
-    if (settings.density < 0.2) setCurrentObservation("🚨 WARNING: There isn't enough gravity left! Galaxies are floating away from each other.");
-  }, [settings.expansion, settings.density]);
-
-  useEffect(() => {
+    // 2. Interactive States
     if (isInteracting) {
       setCurrentObservation("✨ WOW: You made a galaxy! Your giant gravity well clumped the soup together into a solid chunk!");
+      return;
     }
-  }, [isInteracting]);
+
+    // 3. Custom Physics Warnings
+    if (settings.expansion > 2.0) {
+        setCurrentObservation("🚨 WARNING: The universe is stretching way too fast! The soup is flying apart!");
+        return;
+    }
+    if (settings.density < 0.2) {
+        setCurrentObservation("🚨 WARNING: There isn't enough gravity left! Galaxies are floating away from each other.");
+        return;
+    }
+    
+    // 4. Default timeline scrubbing fallbacks
+    if (settings.epoch < 0.5) setCurrentObservation("🪐 The Cosmic Soup: Everything is super hot! The particles bounce around like crazy!");
+    else if (settings.epoch > 1.5) setCurrentObservation("❄️ Time Travel: Approaching absolute zero... the soup is freezing.");
+    else setCurrentObservation("🪐 The Cosmic Soup: Cooling down! Gravity is taking over.");
+
+  }, [settings, isInteracting]);
 
   return (
     <>
