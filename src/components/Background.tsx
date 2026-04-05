@@ -131,7 +131,7 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
 
     const animate = () => {
       // Native fallback clock tracking
-      const elapsedTime = (Date.now() - initTime) * 0.001;
+      const elapsedTime = (Date.now() - initTime) * 0.0002; // Massively reduced baseline physics tick-rate
       
       // Map interactive sandbox settings dynamically into the WebGL Engine each frame
       material.uniforms.uTime.value = elapsedTime;
