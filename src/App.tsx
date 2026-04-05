@@ -75,25 +75,25 @@ function App() {
         <div className="title-container">
           <h1 className="hero-title">Cosmic Entropy</h1>
           <div className="subtitle-row">
-            <p className="hero-subtitle">Transcendental Particles</p>
+            <p className="hero-subtitle">An Interactive Physics Sandbox</p>
             <button 
               className="science-trigger"
               onClick={() => setIsScienceVisible(!isScienceVisible)}
             >
-              {isScienceVisible ? 'HIDE' : 'READ THE SCIENCE'}
+              {isScienceVisible ? 'HIDE' : 'HOW IT WORKS'}
             </button>
           </div>
           
           {isScienceVisible && (
             <div className="science-summary">
               <p>
-                This sandbox is an interactive WebGL simulation mapping the fundamental struggle that dictates the fate of our universe: the battle between <strong>Matter Density (Ωm)</strong> and <strong>Dark Energy (ΩΛ)</strong>.
+                Welcome to the <strong>Cosmic Soup!</strong> This sandbox lets you play with the mathematical rules that control the entire universe.
               </p>
               <p>
-                As governed by Information Theory and the Second Law of Thermodynamics, entropy represents the "hidden information" of a system. To visually demonstrate this, drag your mouse across the canvas. You will create a vortex of <strong>Local Order</strong> (a planetary orbit or star system). However, watch closely: generating this localized structure vigorously agitates the underlying quantum noise field around it, visually demonstrating that creating pockets of order necessitates a massive increase in <strong>Global Entropy</strong>!
+                The universe is governed by <strong>Thermodynamics</strong>. Basically: things that are hot have lots of energy and bounce around incredibly fast! Things that are cold lose their energy, slow down, and eventually freeze dead in their tracks.
               </p>
               <p>
-                In the Laboratory, you can travel entirely outside the human timeline. Use the Epoch slider to reverse time to the ultra-dense Planck Epoch ($10^&#123;-43&#125;$ seconds), or slide it forward to witness Heat Death in the Black Hole Era—where matter density reaches zero, and the universe disperses entirely back into the void.
+                Use the controls on the right to time-travel! If you go all the way back to the beginning of time (<strong>The Big Bang</strong>), the universe was so hot and crowded that the soup was furiously boiling. If you travel all the way to the end of time (<strong>Heat Death</strong>), the soup stretches so far apart that the stars completely freeze!
               </p>
             </div>
           )}
