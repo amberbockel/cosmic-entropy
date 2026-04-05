@@ -55,46 +55,22 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     composer.addPass(renderScene);
     composer.addPass(bloomPass);
 
-    // GEOMETRY GENERATION
-    const tendrilCount = 3000; // Restored high-density particle web!
-    const segmentsPerTendril = 15;
-    const totalVertices = tendrilCount * segmentsPerTendril;
+    // GEOMETRY GENERATION: The Cosmic Soup
+    // Render distinct points instead of connected line segments.
+    const particleCount = 10000;
+    const positions = new Float32Array(particleCount * 3);
+    const randoms = new Float32Array(particleCount * 3);
 
-    const positions = new Float32Array(totalVertices * 3);
-    const lineIndices = new Float32Array(totalVertices);
-    const randoms = new Float32Array(totalVertices * 3);
-    const indices = [];
-
-    let vertexIdx = 0;
-    for (let i = 0; i < tendrilCount; i++) {
-      // Each tendril shares a unique random seed for its position layout
-      const rx = Math.random();
-      const ry = Math.random();
-      const rz = Math.random();
-
-      for (let j = 0; j < segmentsPerTendril; j++) {
-        // We only care about aLineIndex and aRandom, positions are computed 100% in vertex shader
-        lineIndices[vertexIdx] = j / (segmentsPerTendril - 1);
-        
-        randoms[vertexIdx * 3] = rx;
-        randoms[vertexIdx * 3 + 1] = ry;
-        randoms[vertexIdx * 3 + 2] = rz;
-        
-        // Define line segment indices
-        if (j < segmentsPerTendril - 1) {
-          indices.push(vertexIdx, vertexIdx + 1);
-        }
-        
-        vertexIdx++;
-      }
+    for (let i = 0; i < particleCount; i++) {
+        // Unique random seeds to distribute the soup across the cosmos
+        randoms[i * 3] = Math.random();
+        randoms[i * 3 + 1] = Math.random();
+        randoms[i * 3 + 2] = Math.random();
     }
 
     const geometry = new THREE.BufferGeometry();
-    // Position array must exist for Three to not crash, though we overwrite it in shader
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('aLineIndex', new THREE.BufferAttribute(lineIndices, 1));
     geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
-    geometry.setIndex(indices);
 
     // MATERIAL SETUP
     const material = new THREE.ShaderMaterial({
@@ -111,12 +87,11 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
       },
       transparent: true,
       blending: THREE.AdditiveBlending,
-      depthWrite: false, // Don't block other lines from drawing
-      linewidth: 1, // WebGL mostly limits to 1px wide lines, but bloom will thicken it visually!
+      depthWrite: false, 
     });
 
-    const tendrilsMesh = new THREE.LineSegments(geometry, material);
-    scene.add(tendrilsMesh);
+    const particleMesh = new THREE.Points(geometry, material);
+    scene.add(particleMesh);
 
     // MOUSE INTERACTION
     const targetMouse = new THREE.Vector2(-9999.0, -9999.0);
@@ -183,9 +158,9 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
         material.uniforms.uMouse.value.set(currentMouse.x, currentMouse.y);
       }
 
-      // Slowly rotate the entire tendril system
-      tendrilsMesh.rotation.y = elapsedTime * 0.05;
-      tendrilsMesh.rotation.z = elapsedTime * 0.02;
+      // Slowly rotate the entire cosmic soup system
+      particleMesh.rotation.y = elapsedTime * 0.05;
+      particleMesh.rotation.z = elapsedTime * 0.02;
 
       // Smooth camera dollying for zoom control
       const targetZ = targetZRef.current;

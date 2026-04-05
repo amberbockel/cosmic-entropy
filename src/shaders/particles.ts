@@ -7,10 +7,8 @@ export const vertexShader = `
   uniform vec2 uMouse;
   uniform float uAspect;
 
-  attribute float aLineIndex; // 0.0 (head) to 1.0 (tail)
   attribute vec3 aRandom;     // Instanced randomness
 
-  varying float vLife;
   varying float vVelocity;
 
   // Ashima 3D Simplex Noise
@@ -80,12 +78,8 @@ export const vertexShader = `
   }
 
   void main() {
-    // The "head" of the tendril runs at current uTime. 
-    // The "tail" stretches backwards in time to draw a trail!
-    float trailLength = 1.2; // How far back in time the tail exists
     float rawT = (uTime * uSpeed);
-    float t = rawT - (aLineIndex * trailLength);
-    
+    float t = rawT + (aRandom.x * 20.0); // Offset each particle's internal clock randomly
     // Map instance seed to a wide initial position space to heavily de-blob the visual center
     // We intentionally keep this mathematically larger than the maximum noise displacement (10 units logic) 
     // to preserve the empty Black Hole, but small enough to fit natively in the screen.
@@ -110,8 +104,6 @@ export const vertexShader = `
     
     // VVelocity drives color mapped to how quickly Noise shifts the particle
     vVelocity = length(noiseOffset) * 0.1 + (aRandom.y * 0.5);
-    vLife = 1.0 - aLineIndex; // 1.0 = head, 0.0 = tail
-    
     vec3 finalPos = orbitPos + noiseOffset;
     
     // Gravity influence pulls the orbit inward (creates topological density)
@@ -161,39 +153,47 @@ export const vertexShader = `
             vVelocity += environmentalChaos * uBloomOverride * 3.0; // Boosts color to represent radiated heat
         }
     }
+    
+    // Size the particles dynamically based on depth
+    gl_PointSize = clamp(30.0 / gl_Position.w, 1.0, 15.0);
+    // Expand sizes slightly based on dark energy bloom and random seed
+    gl_PointSize *= (1.0 + uBloomOverride * 0.5) * (0.5 + aRandom.z);
   }
 `;
 
 export const fragmentShader = `
   uniform float uBloomOverride;
   varying float vVelocity;
-  varying float vLife; // 1.0 at head, 0.0 at tail
 
   void main() {
-    // Fade out towards the tail
-    float alpha = smoothstep(0.0, 0.8, vLife); 
+    // Circular shaping: discard pixels outside the center of the gl_Point box
+    vec2 coord = gl_PointCoord - vec2(0.5);
+    float dist = length(coord);
+    if (dist > 0.5) discard;
+    
+    // Soft vignette glow on each particle
+    float alpha = smoothstep(0.5, 0.2, dist);
 
-    // Chrome Experiment "Bioluminescence"
-    vec3 colorTail = vec3(0.1, 0.0, 0.4);      // Deep void tail
-    vec3 colorMid = vec3(0.56, 0.0, 1.0);      // Electric Violet
-    vec3 colorHead = vec3(0.0, 1.0, 1.0);      // Cyan Head
+    // Cosmic Soup Thermodynamics Colors
+    // Red = High Heat/Speed, Blue/Purple = Low Heat/Speed
+    vec3 colorCold = vec3(0.0, 0.2, 0.8);      // Deep freezing blue
+    vec3 colorWarm = vec3(0.9, 0.2, 0.5);      // Magenta warmth
+    vec3 colorHot = vec3(1.0, 0.8, 0.1);       // Yellow/White blazing heat
     vec3 colorBurst = vec3(1.0, 1.0, 1.0);     // Pure White interaction burst
     
-    float normVel = clamp(vVelocity * 0.25, 0.0, 1.0);
+    float normVel = clamp(vVelocity * 0.35, 0.0, 1.0);
     
     vec3 finalColor;
-    // Map colors across the tendril length (vLife) and velocity
-    if (vLife < 0.5) {
-        finalColor = mix(colorTail, colorMid, vLife * 2.0);
+    if (normVel < 0.5) {
+        finalColor = mix(colorCold, colorWarm, normVel * 2.0);
     } else {
-        finalColor = mix(colorMid, colorHead, (vLife - 0.5) * 2.0);
+        finalColor = mix(colorWarm, colorHot, (normVel - 0.5) * 2.0);
     }
     
-    // Add velocity boost to make the heads flash wildly when high energy
-    finalColor = mix(finalColor, colorBurst, pow(normVel, 2.0) * vLife);
+    // Extreme heat flashes white
+    finalColor = mix(finalColor, colorBurst, pow(normVel, 4.0));
     
-    // Taper the alpha out linearly, boosting opacity natively by the Bloom slider proxy
     float bloomMultiplier = 1.0 + (uBloomOverride * 1.5);
-    gl_FragColor = vec4(finalColor, clamp(alpha * 0.8 * bloomMultiplier, 0.0, 1.0));
+    gl_FragColor = vec4(finalColor, clamp(alpha * bloomMultiplier, 0.0, 1.0));
   }
 `;

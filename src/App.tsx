@@ -21,19 +21,19 @@ function App() {
   const [currentObservation, setCurrentObservation] = useState("We are at the beginning of Time. Try moving the sliders or your mouse!");
 
   useEffect(() => {
-    if (settings.epoch === 0) setCurrentObservation("🪐 TIME TRAVEL: The very beginning! It's so hot and crowded that atoms can't even form yet!");
-    else if (settings.epoch === 1) setCurrentObservation("🪐 TIME TRAVEL: The Cosmic Web! Gravity is pulling matter together like a giant spider web in space.");
+    if (settings.epoch === 0) setCurrentObservation("🪐 The Cosmic Soup: Everything is super hot! The particles bounce around like crazy!");
+    else if (settings.epoch === 1) setCurrentObservation("🪐 The Cosmic Soup: Cooling down! Gravity is clumping the bouncing dots together into galaxies.");
     else if (settings.epoch === 2) setCurrentObservation("❄️ TIME TRAVEL: The End of Everything. The universe stretched so far that everything froze and drifted apart.");
   }, [settings.epoch]);
 
   useEffect(() => {
-    if (settings.expansion > 2.0) setCurrentObservation("🚨 WARNING: The universe is stretching way too fast! The space web is ripping apart!");
+    if (settings.expansion > 2.0) setCurrentObservation("🚨 WARNING: The universe is stretching way too fast! The soup is flying apart!");
     if (settings.density < 0.2) setCurrentObservation("🚨 WARNING: There isn't enough gravity left! Galaxies are floating away from each other.");
   }, [settings.expansion, settings.density]);
 
   useEffect(() => {
     if (isInteracting) {
-      setCurrentObservation("✨ WOW: You made a galaxy! But remember: creating order here makes the rest of space more chaotic!");
+      setCurrentObservation("✨ WOW: You made a galaxy! Your giant gravity well clumped the soup together into a solid chunk!");
     }
   }, [isInteracting]);
 
