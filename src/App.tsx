@@ -23,15 +23,15 @@ function App() {
   useEffect(() => {
     // 1. Hard-coded Presets and Epochs (Highest Priority for the preset buttons)
     if (settings.epoch === 0 && settings.density === 2.0 && settings.expansion === 2.5) {
-        setCurrentObservation("🔥 THE BIG BANG: It's so hot and crowded that atoms can't even form! The soup is boiling!");
+        setCurrentObservation("🔥 THE BIG BANG: It's so hot the cosmic soup is violently boiling! The extreme heat makes the particles bounce frantically.");
         return;
     }
     if (settings.epoch === 2 && settings.density === 0.0 && settings.expansion === 3.0) {
-        setCurrentObservation("❄️ HEAT DEATH: The universe stretched so far that everything froze and drifted apart into the dark abyss.");
+        setCurrentObservation("❄️ THE BIG FREEZE: The universe has expanded too far! The soup has run out of heat, freezing the particles completely solid.");
         return;
     }
     if (settings.epoch === 1 && settings.density === 0.8 && settings.expansion === 1.0) {
-        setCurrentObservation("🌎 OUR GALAXY: Perfect balance! Gravity is gently clumping the soup together into stars.");
+        setCurrentObservation("🌎 OUR GALAXY: A perfect balance of heat and gravity! Watch the soup naturally clump together into swirling, beautiful galaxies.");
         return;
     }
 

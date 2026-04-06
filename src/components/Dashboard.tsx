@@ -89,9 +89,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, obs
       )}
 
       <div className="preset-buttons">
+        <button onClick={() => applyPreset('plasma')} title="Primordial Chaos">🔥 The Big Bang</button>
         <button onClick={() => applyPreset('current')} title="Our Current Universe">🌎 Our Galaxy</button>
-        <button onClick={() => applyPreset('plasma')} title="Primordial Chaos">🔥 Initial State</button>
-        <button onClick={() => applyPreset('heat_death')} title="Absolute Zero Freezing">❄️ Heat Death</button>
+        <button onClick={() => applyPreset('heat_death')} title="Absolute Zero Freezing">❄️ The Big Freeze</button>
       </div>
 
       <div className="control-group epoch-group">
@@ -107,7 +107,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, obs
           onChange={(e) => handleEpochChange(parseInt(e.target.value))}
         />
         <div className="control-tooltip">
-          Travel through Time: Start at the super hot beginning, watch matter pull into a giant spider web, and end with everything frozen and drifting in the dark.
+          Travel through Time: Start at the super hot beginning, watch gravity slowly clump the soup together into stars, and end with everything frozen and drifting in the dark.
         </div>
       </div>
 
