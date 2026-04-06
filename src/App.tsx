@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [isSandboxVisible, setIsSandboxVisible] = useState(true);
+  const [isSandboxVisible, setIsSandboxVisible] = useState(window.innerWidth > 768);
   const [isScienceVisible, setIsScienceVisible] = useState(false);
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -113,8 +113,17 @@ function App() {
         </div>
       </main>
 
+      {currentObservation && (
+        <div className="observation-hud">
+          <span className="observation-badge">LIVE OBSERVATION</span>
+          <p className="observation-text">{currentObservation}</p>
+        </div>
+      )}
+
+      <div className={`dashboard-backdrop ${isSandboxVisible ? 'visible' : 'hidden'}`} onClick={() => { if (window.innerWidth <= 768) setIsSandboxVisible(false) }} />
+
       <div className={`dashboard-wrapper ${isSandboxVisible ? 'visible' : 'hidden'}`}>
-        <Dashboard settings={settings} setSettings={setSettings} observation={currentObservation} />
+        <Dashboard settings={settings} setSettings={setSettings} />
       </div>
 
       <button 

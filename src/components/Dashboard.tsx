@@ -11,10 +11,9 @@ export interface SimulationSettings {
 interface DashboardProps {
   settings: SimulationSettings;
   setSettings: React.Dispatch<React.SetStateAction<SimulationSettings>>;
-  observation?: string;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, observation }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings }) => {
 
   const updateSetting = (key: keyof SimulationSettings, value: number) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -81,12 +80,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ settings, setSettings, obs
         Your mouse represents a <em>Supermassive Black Hole</em>. Move it around the canvas to bend gravity and scoop the soup into glowing galaxies!
       </div>
 
-      {observation && (
-        <div className="observation-card">
-          <span className="observation-badge">LIVE OBSERVATION</span>
-          <p className="observation-text">{observation}</p>
-        </div>
-      )}
+
 
       <div className="preset-buttons">
         <button onClick={() => applyPreset('plasma')} title="Primordial Chaos">🔥 The Big Bang</button>

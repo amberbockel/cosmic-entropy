@@ -286,6 +286,10 @@
 }
 
 @media (max-width: 768px) {
+  .dashboard-wrapper.hidden {
+    transform: none;
+  }
+  
   .top-nav {
     top: 1.5rem;
     left: 1.5rem;
@@ -298,5 +302,76 @@
   .info-toggle {
     bottom: 1.5rem;
     right: 1.5rem;
+  }
+}
+
+/* Observation HUD (Persistent) */
+.observation-hud {
+  position: absolute;
+  top: clamp(8rem, 15vh, 12rem);
+  left: clamp(2rem, 5vw, 6rem);
+  z-index: 40;
+  pointer-events: none;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  max-width: 400px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: pulseIn 0.4s ease-out forwards;
+}
+
+@media (max-width: 768px) {
+  .observation-hud {
+    top: auto;
+    bottom: 6rem; /* Above the toggle button */
+    left: 1.5rem;
+    right: 1.5rem;
+    max-width: none;
+  }
+}
+
+.observation-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #0df;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.observation-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #f8fafc;
+  margin: 0;
+}
+
+/* Mobile Dashboard Backdrop */
+.dashboard-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 45;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  
+  .dashboard-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
