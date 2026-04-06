@@ -98,7 +98,7 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     const currentMouse = new THREE.Vector2(-9999.0, -9999.0);
     
     let lastInteractTime = 0;
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent | TouchEvent) => {
       // Isolate interaction: Ignore dashboard hovers to prevent UI interference
       if (e.target && (e.target as Element).closest && (e.target as Element).closest('.dashboard-wrapper')) {
         targetMouse.x = -9999.0;
@@ -106,8 +106,23 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
         return;
       }
 
-      targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      let clientX = 0;
+      let clientY = 0;
+      
+      if ('touches' in e) {
+        if (e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          return;
+        }
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      targetMouse.x = (clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(clientY / window.innerHeight) * 2 + 1;
       
       const now = Date.now();
       if (now - lastInteractTime > 500) { // Throttle interaction logs
@@ -124,6 +139,8 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     };
     
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleMouseMove, { passive: false });
+    window.addEventListener('touchstart', handleMouseMove, { passive: false });
     window.addEventListener('wheel', handleWheel, { passive: true });
 
     // ANIMATION LOOP
@@ -239,6 +256,8 @@ export const Background: React.FC<{ settings: SimulationSettings, onReady?: () =
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchstart', handleMouseMove);
       window.removeEventListener('wheel', handleWheel);
       cancelAnimationFrame(animationFrameId);
       
